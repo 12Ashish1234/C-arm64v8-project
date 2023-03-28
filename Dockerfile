@@ -4,6 +4,6 @@ COPY . /usr/src/myapp
 
 WORKDIR /usr/src/myapp
 
-RUN gcc -o myapp hello.c
+RUN gcc -o myapp app.c
 
 CMD ["./myapp"]
