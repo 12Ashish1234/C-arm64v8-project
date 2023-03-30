@@ -4,8 +4,8 @@ name: Docker Build/Publish Image
 on:
   push:
     branches: [ main ]
-  pull_request:
-    types: [opened, synchronize, reopened]
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
 jobs:
   build:
     runs-on: ubuntu-18.04
@@ -15,24 +15,28 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       DOCKER_TARGET_PLATFORM: linux/arm/v8
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed       
+      # BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed       
     steps:
     - name: Checkout the code
       uses: actions/checkout@v1
-#SonarCloud Scanner
-    - name: Install sonar-scanner and build-wrapper
-      uses: SonarSource/sonarcloud-github-c-cpp@v1
-#Running Build wrapper for C
-    # - name: Run build-wrapper
-    #   run: |
-    #       build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} gcc -o myapp app.c
-# Run Sonar Scanner
-    - name: Run sonar-scanner
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+      
+      # For merging SonarQube scan not needed. it will happen during pull request.
+      # Hence pullrequest-build.yml file is created where SonarScan will happen.
+      
+# #SonarCloud Scanner
+#     - name: Install sonar-scanner and build-wrapper
+#       uses: SonarSource/sonarcloud-github-c-cpp@v1
+# #Running Build wrapper for C
+#     - name: Run build-wrapper
+#       run: |
+#           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} gcc -o myapp app.c
+# # Run Sonar Scanner
+#     - name: Run sonar-scanner
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#       run: |
+#           sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
 # Docker image build steps
     - name: Set up Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v1

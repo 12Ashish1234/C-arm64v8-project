@@ -1,0 +1,59 @@
+# what os should it build on?
+
+name: Docker Build/Publish Image
+on:
+  # push:
+  #   branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    env:
+      # DOCKER_REGISTRY: docker.io
+      # DOCKER_IMAGE: ashish21bd/c-arm64v8
+      # DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      # DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      # DOCKER_TARGET_PLATFORM: linux/arm/v8
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed       
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v1
+#SonarCloud Scanner
+    - name: Install sonar-scanner and build-wrapper
+      uses: SonarSource/sonarcloud-github-c-cpp@v1
+#Running Build wrapper for C
+    - name: Run build-wrapper
+      run: |
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} gcc -o myapp app.c
+# Run Sonar Scanner
+    - name: Run sonar-scanner
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+# Docker image build steps
+    # - name: Set up Docker Buildx
+    #   uses: crazy-max/ghaction-docker-buildx@v1
+    #   with:
+    #     version: latest
+    # - name: Prepare  
+    #   if: success()
+    #   id: prepare
+    #   run: |
+    #     echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}
+    #     echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+    #     echo ::set-output name=version::${GITHUB_RUN_NUMBER}
+    # - name: Docker Login
+    #   if: success()
+    #   run: |
+    #     echo "${DOCKER_PASSWORD}" | docker login ${DOCKER_REGISTRY} --username "${DOCKER_USERNAME}" --password-stdin  
+    # - name: Run Buildx (push image)
+    #   if: success()
+    #   run: |
+    #     docker buildx build \
+    #     --platform ${{ steps.prepare.outputs.docker_platform }} \
+    #     --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \
+    #     --file ./Dockerfile \
+    #     --output type=image,push=true .
