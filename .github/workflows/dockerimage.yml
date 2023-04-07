@@ -61,4 +61,3 @@ jobs:
         --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \
         --file ./Dockerfile \
         --output type=image,push=true .
-#
