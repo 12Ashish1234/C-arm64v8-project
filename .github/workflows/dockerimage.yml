@@ -9,7 +9,7 @@ on:
   #   types: [opened, synchronize, reopened]
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       DOCKER_REGISTRY: docker.io
       DOCKER_IMAGE: ashish21bd/c-arm64v8
